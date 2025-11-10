@@ -1,0 +1,42 @@
+package src.sadhana;
+
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+public class FixedWindow extends RateLimiter{
+    Map<Integer, Integer> userRequets;
+    Map<Integer, Long> userWindow;
+
+    public FixedWindow(long windowSize, int capacity) {
+        super(windowSize, capacity);
+        userRequets = new ConcurrentHashMap<>();
+        userWindow = new ConcurrentHashMap<>();
+    }
+
+    private void computeCurrentWindow(int userId, long now){
+        userRequets.putIfAbsent(userId, 0);
+        userWindow.putIfAbsent(userId, now);
+
+        if(userWindow.get(userId)+ windowSize*1000 >= now ){
+
+
+        }else{
+            userRequets.put(userId, 0);
+            userWindow.put(userId, now);
+        }
+
+    }
+
+    @Override
+    boolean canRequest(int userId) {
+
+        long now = System.currentTimeMillis();
+        computeCurrentWindow(userId, now);
+
+        if(userRequets.get(userId) < capacity){
+            userRequets.put(userId, userRequets.get(userId)+1);
+            return true;
+        }
+
+        return false;
+    }
+}
