@@ -38,10 +38,8 @@ enum Direction{
 }
 
 class Snake{
-    Queue<Cell> body;
-    Direction direction;
-
-    Cell snakeHead;
+    Deque<Cell> body;
+    volatile Direction direction;
 
 
     public Snake(Cell cell){
@@ -51,19 +49,20 @@ class Snake{
     }
 
     private void addHead(Cell head){
-        body.add(head);
-        snakeHead = head;
+        body.addFirst(head);
+        Cell snakeHead = body.peekFirst();
         snakeHead.status = cellStatus.SNAKE;
 
     }
 
     private  void removeTail(){
-        Cell last = body.peek();
+        Cell last = body.peekLast();
         last.status = cellStatus.EMPTY;
-        body.poll();
+        body.pollLast();
     }
 
     public Cell next() {
+        Cell snakeHead = body.peekFirst();
         int r = snakeHead.getRow();
         int c = snakeHead.getCol();
 
@@ -109,7 +108,6 @@ class Snake{
     }
 
 }
-
 enum cellStatus{
     FOOD,
     EMPTY,
